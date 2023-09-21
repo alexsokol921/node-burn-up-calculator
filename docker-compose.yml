@@ -1,0 +1,24 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: BurnUpUser
+      POSTGRES_PASSWORD: Test123
+      POSTGRES_DB: BurnUp
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://BurnUpUser:Test123@postgres:5432/BurnUp
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+volumes:
+  postgres-data:
