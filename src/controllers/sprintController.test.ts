@@ -4,6 +4,7 @@ import { SprintService } from '../services/sprintService';
 import { Sprint } from '../models/Sprint';
 import { SprintRepository } from '../repositories/sprintRepository';
 import { VelocityCalculator } from '../utils/velocityCalculator';
+import { Database } from '../database/database';
 
 jest.mock('../services/sprintService', () => {
   return {
@@ -21,7 +22,8 @@ jest.mock('../services/sprintService', () => {
 });
 
 describe('SprintController', () => {
-  const mockSprintRepository = new SprintRepository();
+  const mockDB = new Object() as Database;
+  const mockSprintRepository = new SprintRepository(mockDB);
   const mockVelocityCalculator = new VelocityCalculator();
   const mockSprintService = new SprintService(mockSprintRepository, mockVelocityCalculator) as jest.Mocked<SprintService>;
   const sprintController = new SprintController(mockSprintService);

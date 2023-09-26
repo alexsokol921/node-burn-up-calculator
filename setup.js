@@ -10,26 +10,29 @@ const dbConfig = {
   password: process.env.DB_PASSWORD
 };
 
+export const initializeDatabaseSchema = `
+CREATE TABLE IF NOT EXISTS public.sprints
+(
+    id serial NOT NULL,
+    team_id integer NOT NULL,
+    effort_completed integer NOT NULL,
+    milestone_total_effort integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    sprint_end_date date NOT NULL,
+    CONSTRAINT sprints_pkey PRIMARY KEY (id)
+);
+`;
+
+export const dropDatabaseSchema = `
+  DROP TABLE IF EXISTS public.sprints;
+`;
+
 // Create a database instance
 const db = pgp(dbConfig);
 
 async function setupDatabase() {
   try {
-    await db.none(`
-      CREATE TABLE IF NOT EXISTS public.sprints
-      (
-          id serial NOT NULL,
-          team_id integer NOT NULL,
-          effort_completed integer NOT NULL,
-          milestone_total_effort integer NOT NULL,
-          created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-          sprint_end_date date NOT NULL,
-          CONSTRAINT sprints_pkey PRIMARY KEY (id)
-      );
-
-      ALTER TABLE IF EXISTS public.sprints
-          OWNER to $1:name;
-    `, dbConfig.user);
+    await db.none(initializeDatabaseSchema, dbConfig.user);
 
     console.log('Database setup completed.');
   } catch (error) {
