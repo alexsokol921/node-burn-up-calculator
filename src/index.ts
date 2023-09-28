@@ -22,7 +22,7 @@ app.use(express.json());
 app.use('/api', setupRoutes(sprintController));
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => {
+export const server = app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 });
 

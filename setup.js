@@ -1,4 +1,6 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 const pgp = require('pg-promise')();
 
 // Database connection parameters
@@ -10,36 +12,23 @@ const dbConfig = {
   password: process.env.DB_PASSWORD
 };
 
-export const initializeDatabaseSchema = `
-CREATE TABLE IF NOT EXISTS public.sprints
-(
-    id serial NOT NULL,
-    team_id integer NOT NULL,
-    effort_completed integer NOT NULL,
-    milestone_total_effort integer NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    sprint_end_date date NOT NULL,
-    CONSTRAINT sprints_pkey PRIMARY KEY (id)
-);
-`;
-
-export const dropDatabaseSchema = `
-  DROP TABLE IF EXISTS public.sprints;
-`;
-
 // Create a database instance
 const db = pgp(dbConfig);
 
-async function setupDatabase() {
+// Function to execute an SQL file
+async function executeSqlFile(filePath) {
   try {
-    await db.none(initializeDatabaseSchema, dbConfig.user);
+    // Read the SQL file
+    const sql = fs.readFileSync(filePath, 'utf8');
 
-    console.log('Database setup completed.');
+    // Execute the SQL query
+    await db.none(sql); // Use `none` for SQL statements that don't return data
+    console.log(`SQL file ${filePath} executed successfully.`);
   } catch (error) {
-    console.error('Error setting up database:', error);
-  } finally {
-    pgp.end(); // Close the database connection
+    console.error(`Error executing SQL file ${filePath}: ${error.message}`);
   }
 }
 
-setupDatabase();
+const createTablesSqlFile = path.join(__dirname, 'sql', 'create_tables.sql');
+
+executeSqlFile(createTablesSqlFile);
