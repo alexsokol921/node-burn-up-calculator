@@ -7,7 +7,8 @@
     "start": "node dist/index.js",
     "build": "tsc",
     "test": "npx jest --testPathIgnorePatterns=^tests/",
-    "test:integration": "cross-env DB_IS_IN_MEMORY=true npx jest tests/integration.test.ts --maxWorkers=1"
+    "test:integration": "cross-env DB_IS_IN_MEMORY=true npx jest tests/integration.test.ts --maxWorkers=1",
+    "dockerDatabaseSetup": "docker-compose run --rm app node setup.js"
   },
   "keywords": [],
   "author": "",
