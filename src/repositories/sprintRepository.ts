@@ -1,12 +1,14 @@
-import db from '../database';
 import { Sprint, SprintData } from '../models/Sprint';
+import { Database } from '../database/database';
 
 export abstract class BaseRepository<T> {
   protected abstract tableName: string;
 
+  constructor(protected db: Database) {}
+
   protected async executeQuery(query: string, values: any[]): Promise<T[]> {
     try {
-      const results: T[] = await db.any(query, values);
+      const results: T[] = await this.db.query(query, values);
       return results;
     } catch (error) {
       if (error instanceof Error) {
@@ -66,7 +68,7 @@ export class SprintRepository extends BaseRepository<SprintData> {
     const values = [id];
 
     try {
-      await db.none(query, values);
+      await this.executeQuery(query, values);
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`An error occurred while deleting the sprint: ${error.message}`);
