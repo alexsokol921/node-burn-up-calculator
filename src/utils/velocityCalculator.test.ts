@@ -47,7 +47,7 @@ describe('VelocityCalculator', () => {
 
   it('handles sampleSize greater than sprints length', () => {
     const sprints: Sprint[] = [{ teamId: 1, effortCompleted: 5, milestoneTotalEffort: 140, sprintEndDate: new Date('2023-08-5') }];
-    const sampleSize = 2;
+    const sampleSize = 3;
 
     const [low, average, high] = velocityCalculator.calculateVelocity(sprints, sampleSize);
 

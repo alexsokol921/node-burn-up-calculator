@@ -21,9 +21,7 @@ export class VelocityCalculator {
 
     // Calculate low, average, and high velocity
     const [lowVelocity, highVelocity] = this.calculateLowHighVelocity(
-      sampleSizeSprints.length,
-      sortedSampleSizeSprints,
-      sampleSize
+      sortedSampleSizeSprints
     );
 
     const totalEffort = this.calculateTotalEffort(sampleSizeSprints);
@@ -42,24 +40,23 @@ export class VelocityCalculator {
   }
 
   private calculateLowHighVelocity(
-    sampleSize: number,
-    sortedSampleSizeSprints: Sprint[],
-    fullSampleSize: number
+    sortedSprints: Sprint[]
   ): [number, number] {
+    const sprintCount = sortedSprints.length;
     let lowVelocity;
     let highVelocity;
 
-    switch (sampleSize) {
+    switch (sprintCount) {
       case 2:
-        lowVelocity = sortedSampleSizeSprints[0].effortCompleted;
-        highVelocity = sortedSampleSizeSprints[1].effortCompleted;
+        lowVelocity = sortedSprints[0].effortCompleted;
+        highVelocity = sortedSprints[1].effortCompleted;
         break;
 
       default:
-        const lowSprints = sortedSampleSizeSprints.slice(0, Math.floor(fullSampleSize / 2) + 1);
-        const highSprints = sortedSampleSizeSprints.slice(
-          fullSampleSize - Math.floor(fullSampleSize / 2) - 1,
-          fullSampleSize
+        const lowSprints = sortedSprints.slice(0, Math.floor(sprintCount / 2) + 1);
+        const highSprints = sortedSprints.slice(
+          sprintCount - Math.floor(sprintCount / 2) - 1,
+          sprintCount
         );
 
         const lowSum = this.calculateEffortSum(lowSprints);
