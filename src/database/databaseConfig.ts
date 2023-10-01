@@ -1,10 +1,15 @@
 import dotenv from 'dotenv';
-import { PgPromiseDatabase, PgMemDatabase, Database, DatabaseDriver } from './database';
+import {
+  PgPromiseDatabase,
+  PgMemDatabase,
+  Database,
+  DatabaseDriver,
+} from './database';
 
 dotenv.config();
 let dbDriver: DatabaseDriver;
 
-if (process.env.DB_IS_IN_MEMORY === "true") {
+if (process.env.DB_IS_IN_MEMORY === 'true') {
   dbDriver = new PgMemDatabase();
 } else {
   const connection: any = {

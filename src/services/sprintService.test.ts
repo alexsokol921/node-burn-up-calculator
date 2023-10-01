@@ -13,7 +13,7 @@ jest.mock('../repositories/sprintRepository', () => {
         createSprint: jest.fn(),
         updateSprint: jest.fn(),
         deleteSprint: jest.fn(),
-      }
+      };
     }),
   };
 });
@@ -24,9 +24,14 @@ describe('SprintService', () => {
   });
 
   const mockDB = new Object() as Database;
-  const mockSprintRepository = new SprintRepository(mockDB) as jest.Mocked<SprintRepository>;
+  const mockSprintRepository = new SprintRepository(
+    mockDB
+  ) as jest.Mocked<SprintRepository>;
   const velocityCalculator = new VelocityCalculator();
-  const sprintService = new SprintService(mockSprintRepository, velocityCalculator);
+  const sprintService = new SprintService(
+    mockSprintRepository,
+    velocityCalculator
+  );
 
   const mockSprintData: Sprint[] = [
     {
@@ -126,7 +131,10 @@ describe('SprintService', () => {
 
     mockSprintRepository.getSprintsByTeam.mockResolvedValue(mockSprintData);
 
-    const velocityData = await sprintService.calculateVelocityForTeam(teamId, sampleSize);
+    const velocityData = await sprintService.calculateVelocityForTeam(
+      teamId,
+      sampleSize
+    );
 
     expect(velocityData).toEqual(expectedVelocityData);
   });

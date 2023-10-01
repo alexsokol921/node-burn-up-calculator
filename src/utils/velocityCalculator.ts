@@ -1,7 +1,10 @@
 import { Sprint } from '../models/Sprint';
 
 export class VelocityCalculator {
-  calculateVelocity(sprints: Sprint[], sampleSize: number): [number, number, number] {
+  calculateVelocity(
+    sprints: Sprint[],
+    sampleSize: number
+  ): [number, number, number] {
     if (sprints.length === 0 || sampleSize <= 0) {
       return [0, 0, 0];
     }
@@ -32,16 +35,18 @@ export class VelocityCalculator {
   }
 
   private sortSprintsByEndDate(sprints: Sprint[]): Sprint[] {
-    return sprints.slice().sort((a, b) => a.sprintEndDate.getTime() - b.sprintEndDate.getTime());
+    return sprints
+      .slice()
+      .sort((a, b) => a.sprintEndDate.getTime() - b.sprintEndDate.getTime());
   }
 
   private sortSprintsByEffort(sprints: Sprint[]): Sprint[] {
-    return sprints.slice().sort((a, b) => a.effortCompleted - b.effortCompleted);
+    return sprints
+      .slice()
+      .sort((a, b) => a.effortCompleted - b.effortCompleted);
   }
 
-  private calculateLowHighVelocity(
-    sortedSprints: Sprint[]
-  ): [number, number] {
+  private calculateLowHighVelocity(sortedSprints: Sprint[]): [number, number] {
     const sprintCount = sortedSprints.length;
     let lowVelocity;
     let highVelocity;
@@ -53,7 +58,10 @@ export class VelocityCalculator {
         break;
 
       default:
-        const lowSprints = sortedSprints.slice(0, Math.floor(sprintCount / 2) + 1);
+        const lowSprints = sortedSprints.slice(
+          0,
+          Math.floor(sprintCount / 2) + 1
+        );
         const highSprints = sortedSprints.slice(
           sprintCount - Math.floor(sprintCount / 2) - 1,
           sprintCount

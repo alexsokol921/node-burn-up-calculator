@@ -6,7 +6,7 @@ import { SprintService } from './services/sprintService';
 import { SprintController } from './controllers/sprintController';
 import { VelocityCalculator } from './utils/velocityCalculator';
 import db from './database/databaseConfig';
-import setupRoutes from './routes/routes'; 
+import setupRoutes from './routes/routes';
 
 const app = express();
 const PORT = 3000;

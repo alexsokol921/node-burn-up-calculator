@@ -1,5 +1,5 @@
-import pgPromise from "pg-promise";
-import * as pgMem from "pg-mem";
+import pgPromise from 'pg-promise';
+import * as pgMem from 'pg-mem';
 
 export interface DatabaseDriver {
   query(sql: string, params?: any[]): Promise<any>;
@@ -17,7 +17,9 @@ export class PgPromiseDatabase implements DatabaseDriver {
       return await this.db.any(sql, params);
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`An error occurred while executing the query: ${error.message}`);
+        throw new Error(
+          `An error occurred while executing the query: ${error.message}`
+        );
       } else {
         throw new Error(`An unknown error occurred while executing the query`);
       }
@@ -35,7 +37,7 @@ export class PgMemDatabase implements DatabaseDriver {
   async query(sql: string, params: any[] = []): Promise<any> {
     try {
       // Convert Date objects to ISO strings
-      const formattedParams = params.map(param => {
+      const formattedParams = params.map((param) => {
         if (param instanceof Date) {
           return param.toISOString();
         }
@@ -48,7 +50,9 @@ export class PgMemDatabase implements DatabaseDriver {
       return results.rows;
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`An error occurred while executing the query: ${error.message}`);
+        throw new Error(
+          `An error occurred while executing the query: ${error.message}`
+        );
       } else {
         throw new Error(`An unknown error occurred while executing the query`);
       }

@@ -4,7 +4,7 @@ import { Database } from '../database/database';
 
 describe('sprintRepository', () => {
   let sprintRepository: SprintRepository;
-  const mockDB = new Object as Database;
+  const mockDB = new Object() as Database;
 
   const mockSprintData: SprintData[] = [
     {
@@ -24,7 +24,7 @@ describe('sprintRepository', () => {
       created_at: new Date('2023-08-13'),
     },
   ];
-  
+
   const mockSprints: Sprint[] = [
     {
       id: 1,
@@ -51,7 +51,7 @@ describe('sprintRepository', () => {
   describe('getSprints', () => {
     it('should fetch sprints', async () => {
       mockDB.query = jest.fn().mockResolvedValue(mockSprintData);
-      
+
       const sprints = await sprintRepository.getSprints();
 
       expect(sprints).toEqual(mockSprints);
@@ -61,7 +61,9 @@ describe('sprintRepository', () => {
   describe('getSprintsByTeam', () => {
     it('should fetch sprints by team', async () => {
       const teamId = 1;
-      const expectedSprints = mockSprints.filter((sprint) => sprint.teamId === teamId);
+      const expectedSprints = mockSprints.filter(
+        (sprint) => sprint.teamId === teamId
+      );
       mockDB.query = jest.fn().mockResolvedValue(mockSprintData);
 
       const sprints = await sprintRepository.getSprintsByTeam(teamId);
@@ -77,7 +79,12 @@ describe('sprintRepository', () => {
       const effortCompleted = 10;
       const milestoneTotalEffort = 20;
       const sprintEndDate = new Date('2023-08-05');
-      const sprint = await sprintRepository.createSprint(teamId, effortCompleted, milestoneTotalEffort, sprintEndDate);
+      const sprint = await sprintRepository.createSprint(
+        teamId,
+        effortCompleted,
+        milestoneTotalEffort,
+        sprintEndDate
+      );
 
       expect(sprint).toEqual({
         id: expect.any(Number),
@@ -106,15 +113,21 @@ describe('sprintRepository', () => {
           milestone_total_effort: milestoneTotalEffort,
           sprint_end_date: sprintEndDate,
           created_at: new Date(),
-        }
+        },
       ]);
 
-      const sprint = await sprintRepository.updateSprint(id, teamId, effortCompleted, milestoneTotalEffort, sprintEndDate);
+      const sprint = await sprintRepository.updateSprint(
+        id,
+        teamId,
+        effortCompleted,
+        milestoneTotalEffort,
+        sprintEndDate
+      );
 
       expect(mockDB.query).toHaveBeenCalledWith(
-      'UPDATE sprints SET team_id = $1, effort_completed = $2, milestone_total_effort = $3, sprint_end_date = $4 WHERE id = $5 RETURNING *',
-      [teamId, effortCompleted, milestoneTotalEffort, sprintEndDate, id]
-    );
+        'UPDATE sprints SET team_id = $1, effort_completed = $2, milestone_total_effort = $3, sprint_end_date = $4 WHERE id = $5 RETURNING *',
+        [teamId, effortCompleted, milestoneTotalEffort, sprintEndDate, id]
+      );
 
       expect(sprint).toEqual({
         id,
@@ -135,7 +148,10 @@ describe('sprintRepository', () => {
 
       await sprintRepository.deleteSprint(id);
 
-      expect(mockDB.query).toHaveBeenCalledWith('DELETE FROM sprints WHERE id = $1', [id]);
+      expect(mockDB.query).toHaveBeenCalledWith(
+        'DELETE FROM sprints WHERE id = $1',
+        [id]
+      );
     });
   });
 });
