@@ -11,24 +11,42 @@ export class SprintController {
 
   getSprints = async (req: Request, res: Response): Promise<void> => {
     try {
-      const sprints: Sprint[] = await this.sprintService.getSprints();
+      const { page = 1, pageSize = 10 } = req.query;
+      const parsedPage = parseInt(page as string, 10);
+      const parsedPageSize = parseInt(pageSize as string, 10);
+
+      const sprints: Sprint[] = await this.sprintService.getSprints(
+        parsedPage,
+        parsedPageSize
+      );
       res.status(200).json(sprints);
     } catch (error) {
       this.handleServerError(res, 'An error occurred while fetching sprints.');
     }
-  }
+  };
 
   getSprintsByTeam = async (req: Request, res: Response): Promise<void> => {
     try {
       const { teamId } = req.params;
       const parsedTeamId = parseInt(teamId, 10);
 
-      const teamSprints: Sprint[] = await this.sprintService.getSprintsByTeam(parsedTeamId);
+      const { page = 1, pageSize = 10 } = req.query;
+      const parsedPage = parseInt(page as string, 10);
+      const parsedPageSize = parseInt(pageSize as string, 10);
+
+      const teamSprints: Sprint[] = await this.sprintService.getSprintsByTeam(
+        parsedTeamId,
+        parsedPage,
+        parsedPageSize
+      );
       res.status(200).json(teamSprints);
     } catch (error) {
-      this.handleServerError(res, 'An error occurred while fetching sprints by team.');
+      this.handleServerError(
+        res,
+        'An error occurred while fetching sprints by team.'
+      );
     }
-  }
+  };
 
   getVelocityByTeam = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -36,37 +54,66 @@ export class SprintController {
       const parsedTeamId = parseInt(teamId, 10);
       const parsedSampleSize = parseInt(sampleSize, 10);
 
-      const [sprints, lowVelocity, averageVelocity, highVelocity]: [Sprint[], number, number, number] = await this.sprintService.calculateVelocityForTeam(parsedTeamId, parsedSampleSize);
-      res.status(200).json({ sprints, lowVelocity, averageVelocity, highVelocity });
+      const [sprints, lowVelocity, averageVelocity, highVelocity]: [
+        Sprint[],
+        number,
+        number,
+        number
+      ] = await this.sprintService.calculateVelocityForTeam(
+        parsedTeamId,
+        parsedSampleSize
+      );
+      res
+        .status(200)
+        .json({ sprints, lowVelocity, averageVelocity, highVelocity });
     } catch (error) {
-      this.handleServerError(res, 'An error occured while calculating velocity by team.');
+      this.handleServerError(
+        res,
+        'An error occured while calculating velocity by team.'
+      );
     }
-  }
+  };
 
   createSprint = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { teamId, effortCompleted, milestoneTotalEffort, sprintEndDate } = req.body;
+      const { teamId, effortCompleted, milestoneTotalEffort, sprintEndDate } =
+        req.body;
 
-      const newSprint: Sprint = await this.sprintService.createSprint(teamId, effortCompleted, milestoneTotalEffort, sprintEndDate);
+      const newSprint: Sprint = await this.sprintService.createSprint(
+        teamId,
+        effortCompleted,
+        milestoneTotalEffort,
+        sprintEndDate
+      );
       res.status(201).json(newSprint);
     } catch (error) {
       this.handleServerError(res, 'An error occurred while creating a sprint.');
     }
-  }
+  };
 
   updateSprint = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
       const parsedId = parseInt(id, 10);
 
-      const { teamId, effortCompleted, milestoneTotalEffort, sprintEndDate } = req.body;
+      const { teamId, effortCompleted, milestoneTotalEffort, sprintEndDate } =
+        req.body;
 
-      const updatedSprint: Sprint = await this.sprintService.updateSprint(parsedId, teamId, effortCompleted, milestoneTotalEffort, sprintEndDate);
+      const updatedSprint: Sprint = await this.sprintService.updateSprint(
+        parsedId,
+        teamId,
+        effortCompleted,
+        milestoneTotalEffort,
+        sprintEndDate
+      );
       res.status(200).json(updatedSprint);
     } catch (error) {
-      this.handleServerError(res, 'An error occurred while updating the sprint.');
+      this.handleServerError(
+        res,
+        'An error occurred while updating the sprint.'
+      );
     }
-  }
+  };
 
   deleteSprint = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -76,11 +123,14 @@ export class SprintController {
       await this.sprintService.deleteSprint(parsedId);
       res.status(204).send();
     } catch (error) {
-      this.handleServerError(res, 'An error occurred while deleting the sprint.');
+      this.handleServerError(
+        res,
+        'An error occurred while deleting the sprint.'
+      );
     }
-  }
+  };
 
   private handleServerError = (res: Response, errorMessage: string): void => {
     res.status(500).json({ error: errorMessage });
-  }
+  };
 }

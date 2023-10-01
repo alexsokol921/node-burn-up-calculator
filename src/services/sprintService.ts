@@ -6,17 +6,24 @@ export class SprintService {
   private sprintRepository: SprintRepository;
   private velocityCalculator: VelocityCalculator;
 
-  constructor(sprintRepository: SprintRepository, velocityCalculator: VelocityCalculator) {
+  constructor(
+    sprintRepository: SprintRepository,
+    velocityCalculator: VelocityCalculator
+  ) {
     this.sprintRepository = sprintRepository;
     this.velocityCalculator = velocityCalculator;
   }
 
-  async getSprints(): Promise<Sprint[]> {
-    return await this.sprintRepository.getSprints();
+  async getSprints(page: number = 1, pageSize: number = 10): Promise<Sprint[]> {
+    return await this.sprintRepository.getSprints(page, pageSize);
   }
 
-  async getSprintsByTeam(teamId: number): Promise<Sprint[]> {
-    return await this.sprintRepository.getSprintsByTeam(teamId);
+  async getSprintsByTeam(
+    teamId: number,
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<Sprint[]> {
+    return await this.sprintRepository.getSprintsByTeam(teamId, page, pageSize);
   }
 
   async createSprint(
@@ -58,10 +65,8 @@ export class SprintService {
     sampleSize: number
   ): Promise<[Sprint[], number, number, number]> {
     const sprints = await this.getSprintsByTeam(teamId);
-    const [lowVelocity, averageVelocity, highVelocity] = this.velocityCalculator.calculateVelocity(
-      sprints,
-      sampleSize
-    );
+    const [lowVelocity, averageVelocity, highVelocity] =
+      this.velocityCalculator.calculateVelocity(sprints, sampleSize);
 
     return [sprints, lowVelocity, averageVelocity, highVelocity];
   }

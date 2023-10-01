@@ -16,7 +16,7 @@ jest.mock('../services/sprintService', () => {
         createSprint: jest.fn(),
         updateSprint: jest.fn(),
         deleteSprint: jest.fn(),
-      }
+      };
     }),
   };
 });
@@ -25,22 +25,42 @@ describe('SprintController', () => {
   const mockDB = new Object() as Database;
   const mockSprintRepository = new SprintRepository(mockDB);
   const mockVelocityCalculator = new VelocityCalculator();
-  const mockSprintService = new SprintService(mockSprintRepository, mockVelocityCalculator) as jest.Mocked<SprintService>;
+  const mockSprintService = new SprintService(
+    mockSprintRepository,
+    mockVelocityCalculator
+  ) as jest.Mocked<SprintService>;
   const sprintController = new SprintController(mockSprintService);
 
   describe('getSprints', () => {
     it('should get a list of sprints', async () => {
       const mockSprints: Sprint[] = [
-        { id: 1, teamId: 1, effortCompleted: 10, milestoneTotalEffort: 20, sprintEndDate: new Date() },
-        { id: 2, teamId: 1, effortCompleted: 15, milestoneTotalEffort: 30, sprintEndDate: new Date() },
+        {
+          id: 1,
+          teamId: 1,
+          effortCompleted: 10,
+          milestoneTotalEffort: 20,
+          sprintEndDate: new Date(),
+        },
+        {
+          id: 2,
+          teamId: 1,
+          effortCompleted: 15,
+          milestoneTotalEffort: 30,
+          sprintEndDate: new Date(),
+        },
       ];
 
       mockSprintService.getSprints.mockResolvedValue(mockSprints);
 
-      const req = {} as Request;
+      const req = {
+        query: {
+          page: '1',
+          pageSize: '10',
+        },
+      } as Request<any, any, any, any, any>;
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.getSprints(req, res);
@@ -50,12 +70,19 @@ describe('SprintController', () => {
     });
 
     it('should handle database errors', async () => {
-      mockSprintService.getSprints.mockRejectedValue(new Error('Service error'));
+      mockSprintService.getSprints.mockRejectedValue(
+        new Error('Service error')
+      );
 
-      const req = {} as Request;
+      const req = {
+        query: {
+          page: '1',
+          pageSize: '10',
+        },
+      } as Request<any, any, any, any, any>;
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.getSprints(req, res);
@@ -70,8 +97,20 @@ describe('SprintController', () => {
   describe('getSprintsByTeam', () => {
     it('should get a list of sprints for a team', async () => {
       const mockSprints: Sprint[] = [
-        { id: 1, teamId: 1, effortCompleted: 10, milestoneTotalEffort: 20, sprintEndDate: new Date() },
-        { id: 2, teamId: 1, effortCompleted: 15, milestoneTotalEffort: 30, sprintEndDate: new Date() },
+        {
+          id: 1,
+          teamId: 1,
+          effortCompleted: 10,
+          milestoneTotalEffort: 20,
+          sprintEndDate: new Date(),
+        },
+        {
+          id: 2,
+          teamId: 1,
+          effortCompleted: 15,
+          milestoneTotalEffort: 30,
+          sprintEndDate: new Date(),
+        },
       ];
 
       mockSprintService.getSprintsByTeam.mockResolvedValue(mockSprints);
@@ -80,11 +119,15 @@ describe('SprintController', () => {
         params: {
           teamId: '1',
         },
+        query: {
+          page: '1',
+          pageSize: '10',
+        },
       } as Request<any, any, any, any, any>;
 
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.getSprintsByTeam(req, res);
@@ -94,7 +137,9 @@ describe('SprintController', () => {
     });
 
     it('should handle database errors', async () => {
-      mockSprintService.getSprintsByTeam.mockRejectedValue(new Error('Service error'));
+      mockSprintService.getSprintsByTeam.mockRejectedValue(
+        new Error('Service error')
+      );
 
       const req = {
         params: {
@@ -104,7 +149,7 @@ describe('SprintController', () => {
 
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.getSprintsByTeam(req, res);
@@ -118,18 +163,47 @@ describe('SprintController', () => {
 
   describe('getVelocityByTeam', () => {
     it('should get a list of sprints and velocity for a team', async () => {
-      const mockResults: [Sprint[], number, number, number] = [[
-        { id: 1, teamId: 1, effortCompleted: 10, milestoneTotalEffort: 20, sprintEndDate: new Date('2023-08-27') },
-        { id: 2, teamId: 1, effortCompleted: 15, milestoneTotalEffort: 30, sprintEndDate: new Date('2023-08-28') },
-      ], 5, 10, 15];
+      const mockResults: [Sprint[], number, number, number] = [
+        [
+          {
+            id: 1,
+            teamId: 1,
+            effortCompleted: 10,
+            milestoneTotalEffort: 20,
+            sprintEndDate: new Date('2023-08-27'),
+          },
+          {
+            id: 2,
+            teamId: 1,
+            effortCompleted: 15,
+            milestoneTotalEffort: 30,
+            sprintEndDate: new Date('2023-08-28'),
+          },
+        ],
+        5,
+        10,
+        15,
+      ];
 
       const mockResponse = {
         lowVelocity: 5,
         averageVelocity: 10,
         highVelocity: 15,
         sprints: [
-          { id: 1, teamId: 1, effortCompleted: 10, milestoneTotalEffort: 20, sprintEndDate: new Date('2023-08-27') },
-          { id: 2, teamId: 1, effortCompleted: 15, milestoneTotalEffort: 30, sprintEndDate: new Date('2023-08-28') },
+          {
+            id: 1,
+            teamId: 1,
+            effortCompleted: 10,
+            milestoneTotalEffort: 20,
+            sprintEndDate: new Date('2023-08-27'),
+          },
+          {
+            id: 2,
+            teamId: 1,
+            effortCompleted: 15,
+            milestoneTotalEffort: 30,
+            sprintEndDate: new Date('2023-08-28'),
+          },
         ],
       };
 
@@ -138,13 +212,13 @@ describe('SprintController', () => {
       const req = {
         params: {
           teamId: '1',
-          sampleSize: '3'
+          sampleSize: '3',
         },
       } as Request<any, any, any, any, any>;
 
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.getVelocityByTeam(req, res);
@@ -154,18 +228,20 @@ describe('SprintController', () => {
     });
 
     it('should handle database errors', async () => {
-      mockSprintService.calculateVelocityForTeam.mockRejectedValue(new Error('Service error'));
+      mockSprintService.calculateVelocityForTeam.mockRejectedValue(
+        new Error('Service error')
+      );
 
       const req = {
         params: {
           teamId: '1',
-          sampleSize: '3'
+          sampleSize: '3',
         },
       } as Request<any, any, any, any, any>;
 
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.getVelocityByTeam(req, res);
@@ -180,7 +256,13 @@ describe('SprintController', () => {
   describe('createSprint', () => {
     it('should create a new sprint', async () => {
       const sprintEndDate: Date = new Date('2023-08-28');
-      const mockSprint: Sprint = { id: 1, teamId: 1, effortCompleted: 10, milestoneTotalEffort: 20, sprintEndDate: sprintEndDate };
+      const mockSprint: Sprint = {
+        id: 1,
+        teamId: 1,
+        effortCompleted: 10,
+        milestoneTotalEffort: 20,
+        sprintEndDate: sprintEndDate,
+      };
 
       mockSprintService.createSprint.mockResolvedValue(mockSprint);
 
@@ -195,7 +277,7 @@ describe('SprintController', () => {
 
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.createSprint(req, res);
@@ -205,7 +287,9 @@ describe('SprintController', () => {
     });
 
     it('should handle errors while creating a sprint', async () => {
-      mockSprintService.createSprint.mockRejectedValue(new Error('Service error'));
+      mockSprintService.createSprint.mockRejectedValue(
+        new Error('Service error')
+      );
 
       const req = {
         body: {
@@ -218,7 +302,7 @@ describe('SprintController', () => {
 
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.createSprint(req, res);
@@ -232,7 +316,13 @@ describe('SprintController', () => {
 
   describe('updateSprint', () => {
     it('should update a sprint', async () => {
-      const mockSprint = { id: 1, teamId: 1, effortCompleted: 15, milestoneTotalEffort: 30, sprintEndDate: new Date('2023-08-30') };
+      const mockSprint = {
+        id: 1,
+        teamId: 1,
+        effortCompleted: 15,
+        milestoneTotalEffort: 30,
+        sprintEndDate: new Date('2023-08-30'),
+      };
 
       mockSprintService.updateSprint.mockResolvedValue(mockSprint);
 
@@ -248,7 +338,7 @@ describe('SprintController', () => {
 
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.updateSprint(req, res);
@@ -258,7 +348,9 @@ describe('SprintController', () => {
     });
 
     it('should handle database errors', async () => {
-      mockSprintService.updateSprint.mockRejectedValue(new Error('Service error'));
+      mockSprintService.updateSprint.mockRejectedValue(
+        new Error('Service error')
+      );
 
       const req = {
         params: { id: '1' },
@@ -272,7 +364,7 @@ describe('SprintController', () => {
 
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.updateSprint(req, res);
@@ -304,7 +396,9 @@ describe('SprintController', () => {
     });
 
     it('should handle database errors', async () => {
-      mockSprintService.deleteSprint.mockRejectedValue(new Error('Service error'));
+      mockSprintService.deleteSprint.mockRejectedValue(
+        new Error('Service error')
+      );
 
       const req = {
         params: { id: '1' },
@@ -312,7 +406,7 @@ describe('SprintController', () => {
 
       const res = {
         status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+        json: jest.fn(),
       } as unknown as Response;
 
       await sprintController.deleteSprint(req, res);

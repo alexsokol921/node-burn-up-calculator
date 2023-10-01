@@ -12,7 +12,9 @@ export abstract class BaseRepository<T> {
       return results;
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`An error occurred while executing the query: ${error.message}`);
+        throw new Error(
+          `An error occurred while executing the query: ${error.message}`
+        );
       } else {
         throw new Error(`An unknown error occurred while executing the query`);
       }
@@ -23,15 +25,37 @@ export abstract class BaseRepository<T> {
 export class SprintRepository extends BaseRepository<SprintData> {
   protected tableName = 'sprints';
 
-  async getSprints(): Promise<Sprint[]> {
-    const query = `SELECT * FROM ${this.tableName}`;
-    const results: SprintData[] = await this.executeQuery(query, []);
+  async getSprints(page: number = 1, pageSize: number = 10): Promise<Sprint[]> {
+    const offset = (page - 1) * pageSize; // Calculate the offset based on page number
+    const query = `
+      SELECT * 
+      FROM ${this.tableName}
+      ORDER BY sprint_end_date DESC
+      LIMIT $1
+      OFFSET $2
+    `;
+    const values = [pageSize, offset];
+
+    const results: SprintData[] = await this.executeQuery(query, values);
     return results.map(SprintMapper.mapToSprintModel);
   }
 
-  async getSprintsByTeam(teamId: number): Promise<Sprint[]> {
-    const query = `SELECT * FROM ${this.tableName} WHERE team_id = $1`;
-    const values = [teamId];
+  async getSprintsByTeam(
+    teamId: number,
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<Sprint[]> {
+    const offset = (page - 1) * pageSize; // Calculate the offset based on page number
+    const query = `
+      SELECT * 
+      FROM ${this.tableName} 
+      WHERE team_id = $1
+      ORDER BY sprint_end_date DESC
+      LIMIT $2
+      OFFSET $3
+    `;
+    const values = [teamId, pageSize, offset];
+
     const results: SprintData[] = await this.executeQuery(query, values);
     return results.map(SprintMapper.mapToSprintModel);
   }
@@ -42,9 +66,13 @@ export class SprintRepository extends BaseRepository<SprintData> {
     milestoneTotalEffort: number,
     sprintEndDate: Date
   ): Promise<Sprint> {
-    const query =
-      `INSERT INTO ${this.tableName} (team_id, effort_completed, milestone_total_effort, sprint_end_date) VALUES ($1, $2, $3, $4) RETURNING *`;
-    const values = [teamId, effortCompleted, milestoneTotalEffort, sprintEndDate];
+    const query = `INSERT INTO ${this.tableName} (team_id, effort_completed, milestone_total_effort, sprint_end_date) VALUES ($1, $2, $3, $4) RETURNING *`;
+    const values = [
+      teamId,
+      effortCompleted,
+      milestoneTotalEffort,
+      sprintEndDate,
+    ];
     const results: SprintData[] = await this.executeQuery(query, values);
     return SprintMapper.mapToSprintModel(results[0]);
   }
@@ -56,9 +84,14 @@ export class SprintRepository extends BaseRepository<SprintData> {
     milestoneTotalEffort: number,
     sprintEndDate: Date
   ): Promise<Sprint> {
-    const query =
-      `UPDATE ${this.tableName} SET team_id = $1, effort_completed = $2, milestone_total_effort = $3, sprint_end_date = $4 WHERE id = $5 RETURNING *`;
-    const values = [teamId, effortCompleted, milestoneTotalEffort, sprintEndDate, id];
+    const query = `UPDATE ${this.tableName} SET team_id = $1, effort_completed = $2, milestone_total_effort = $3, sprint_end_date = $4 WHERE id = $5 RETURNING *`;
+    const values = [
+      teamId,
+      effortCompleted,
+      milestoneTotalEffort,
+      sprintEndDate,
+      id,
+    ];
     const results: SprintData[] = await this.executeQuery(query, values);
     return SprintMapper.mapToSprintModel(results[0]);
   }
@@ -71,7 +104,9 @@ export class SprintRepository extends BaseRepository<SprintData> {
       await this.executeQuery(query, values);
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`An error occurred while deleting the sprint: ${error.message}`);
+        throw new Error(
+          `An error occurred while deleting the sprint: ${error.message}`
+        );
       } else {
         throw new Error(`An unknown error occurred while deleting the sprint`);
       }
