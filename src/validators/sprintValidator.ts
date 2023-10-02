@@ -2,10 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import { validationResult, check } from 'express-validator';
 
 export const validateGetSprints = [
-  check('page').isInt(),
-  check('pageSize').isInt(),
+  check('page').optional().isInt(),
+  check('pageSize').optional().isInt(),
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
+    console.log(errors);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -15,8 +16,8 @@ export const validateGetSprints = [
 
 export const validateGetSprintsByTeam = [
   check('teamId').isInt(),
-  check('page').isInt(),
-  check('pageSize').isInt(),
+  check('page').optional().isInt(),
+  check('pageSize').optional().isInt(),
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
